@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { Text } from 'react-native';
 import { Colors } from '@/constants/Colors';
+import Ionicons from '@expo/vector-icons/build/Ionicons';
 
 function TabIcon({ emoji }: { emoji: string }) {
   return <Text style={{ fontSize: 20 }}>{emoji}</Text>;
@@ -27,7 +28,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title:       'Inicio',
-          tabBarIcon:  () => <TabIcon emoji="🏠" />,
+          tabBarIcon:  ({ color }) => <Ionicons name="home-outline" size={24} color={color} />,
           headerTitle: '¡Hola, tendero! 👋',
         }}
       />
@@ -35,7 +36,7 @@ export default function TabLayout() {
         name="chat"
         options={{
           title:       'Agente',
-          tabBarIcon:  () => <TabIcon emoji="🤖" />,
+          tabBarIcon:  ({ color }) => <Ionicons name="chatbubble-ellipses-outline" size={24} color={color} />,
           headerTitle: 'Tu Agente de Crecimiento',
         }}
       />
@@ -43,7 +44,7 @@ export default function TabLayout() {
         name="meta"
         options={{
           title:       'Mi Meta',
-          tabBarIcon:  () => <TabIcon emoji="🎯" />,
+          tabBarIcon:  ({ color }) => <Ionicons name="rocket" size={24} color={color} />,
           headerTitle: 'Mi Meta de Negocio',
         }}
       />
@@ -51,8 +52,15 @@ export default function TabLayout() {
         name="progreso"
         options={{
           title:       'Progreso',
-          tabBarIcon:  () => <TabIcon emoji="📈" />,
+          tabBarIcon:  ({ color }) => <Ionicons name="stats-chart" size={24} color={color} />,
           headerTitle: 'Mi Progreso Semanal',
+        }}
+      />
+      <Tabs.Screen
+        name="perfil"
+        options={{
+          title: 'Perfil',
+          tabBarIcon: ({ color }) => <Ionicons name="person-outline" size={24} color={color} />,
         }}
       />
     </Tabs>

@@ -1,13 +1,19 @@
 import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
+import { AuthProvider } from '../api/authContext'; // <-- Importamos el Provider
 
 export default function RootLayout() {
   return (
-    <>
-      <StatusBar style="light" />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
+    // Envolvemos toda la navegación con el AuthProvider
+    <AuthProvider>
+      <Stack>
+        {/* Tu pantalla de login sin encabezado */}
+        <Stack.Screen name="login" options={{ headerShown: false }} />
+        
+        {/* Tus pestañas sin encabezado extra */}
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        
+        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>
-    </>
+    </AuthProvider>
   );
 }

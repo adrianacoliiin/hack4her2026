@@ -175,28 +175,25 @@ const styles = StyleSheet.create({
   content:   { padding: 16, paddingBottom: 32 },
   center:    { flex: 1, justifyContent: 'center', alignItems: 'center' },
 
-  activeCard: {
-    backgroundColor: Colors.primary,
+ activeCard: {
+    backgroundColor: Colors.card, // <-- Aquí cambiamos el fondo a blanco
     borderRadius:    16,
     padding:         20,
     marginBottom:    20,
+    borderWidth:     1, // Le agregamos un borde sutil para que se vea como tarjeta
+    borderColor:     Colors.border,
   },
-  activeLabel:   { color: 'rgba(255,255,255,0.8)', fontSize: 12, fontWeight: '600', marginBottom: 6 },
-  activeText:    { color: Colors.white, fontSize: 18, fontWeight: '700', marginBottom: 16 },
+  activeLabel:   { color: Colors.textMuted, fontSize: 12, fontWeight: '600', marginBottom: 6 },
+  activeText:    { color: Colors.text, fontSize: 18, fontWeight: '700', marginBottom: 16 },
 
   progressSection: { marginBottom: 16 },
   statsRow:        { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 12 },
-  progressBar:  { backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: 4, height: 8, marginBottom: 6 },
-  progressFill: { backgroundColor: Colors.white, borderRadius: 4, height: 8 },
-  progressLabel:{ color: 'rgba(255,255,255,0.85)', fontSize: 12, textAlign: 'center' },
+  progressBar:  { backgroundColor: Colors.background, borderRadius: 4, height: 8, marginBottom: 6 },
+  progressFill: { backgroundColor: Colors.primary, borderRadius: 4, height: 8 }, // <-- La barra se llena en rojo
+  progressLabel:{ color: Colors.textLight, fontSize: 12, textAlign: 'center' },
 
-  changeBtn:     { backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 8, padding: 10, alignItems: 'center' },
-  changeBtnText: { color: Colors.white, fontWeight: '600' },
-
-  form:         { backgroundColor: Colors.card, borderRadius: 16, padding: 20 },
-  formTitle:    { fontSize: 20, fontWeight: '800', color: Colors.text, marginBottom: 6 },
-  formSubtitle: { fontSize: 13, color: Colors.textLight, marginBottom: 20, lineHeight: 18 },
-  label:        { fontSize: 13, fontWeight: '600', color: Colors.text, marginBottom: 8, marginTop: 12 },
+  changeBtn:     { backgroundColor: Colors.background, borderRadius: 8, padding: 10, alignItems: 'center' },
+  changeBtnText: { color: Colors.primary, fontWeight: '600' }, // <-- Botón con texto rojo
 
   typeRow: { gap: 8 },
   typeBtn: {

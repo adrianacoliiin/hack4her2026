@@ -1,5 +1,5 @@
 export const Colors = {
-  primary:    '#E8001A',   // Rojo Tuali
+  primary:    '#d91c34',   // Rojo Tuali
   primaryDark:'#B8001A',
   white:      '#FFFFFF',
   background: '#F5F5F5',

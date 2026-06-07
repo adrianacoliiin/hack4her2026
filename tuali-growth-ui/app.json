@@ -4,7 +4,7 @@
     "slug": "tuali-growth-ui",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo-rojo.png",
     "scheme": "tualigrowthui",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,

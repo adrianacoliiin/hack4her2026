@@ -114,8 +114,10 @@ export default function ProgresoScreen() {
 function StatBox({ label, value, color }: { label: string; value: number; color?: string }) {
   return (
     <View style={{ alignItems: 'center' }}>
-      <Text style={{ fontSize: 26, fontWeight: '800', color: color ?? Colors.white }}>{value}</Text>
-      <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>{label}</Text>
+      {/* Cambiamos el blanco por Colors.text por defecto */}
+      <Text style={{ fontSize: 26, fontWeight: '800', color: color ?? Colors.text }}>{value}</Text>
+      {/* Cambiamos el texto transparente por Colors.textMuted */}
+      <Text style={{ fontSize: 11, color: Colors.textMuted }}>{label}</Text>
     </View>
   );
 }
@@ -127,21 +129,20 @@ const styles = StyleSheet.create({
   header: { marginBottom: 8 },
 
   summaryCard: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.card, // <-- Fondo blanco
     borderRadius:    16,
     padding:         20,
     marginBottom:    20,
+    borderWidth:     1,           // <-- Borde como tarjeta
+    borderColor:     Colors.border,
   },
-  summaryMeta: { color: 'rgba(255,255,255,0.9)', fontSize: 13, fontWeight: '600', marginBottom: 14 },
+  summaryMeta: { color: Colors.textMuted, fontSize: 13, fontWeight: '600', marginBottom: 14 }, // <-- Texto oscuro
   statsRow:    { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 14 },
 
-  progressTrack:{ backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: 6, height: 10, marginBottom: 6 },
-  progressFill: { backgroundColor: Colors.white, borderRadius: 6, height: 10 },
-  progressLabel:{ color: 'rgba(255,255,255,0.85)', fontSize: 12, textAlign: 'center', marginBottom: 12 },
+  progressTrack:{ backgroundColor: Colors.background, borderRadius: 6, height: 10, marginBottom: 6 }, // <-- Fondo gris claro
+  progressFill: { backgroundColor: Colors.primary, borderRadius: 6, height: 10 }, // <-- Barra que se llena de rojo
+  progressLabel:{ color: Colors.textLight, fontSize: 12, textAlign: 'center', marginBottom: 12 }, // <-- Texto oscuro
 
-  mensajeBadge: { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 8, padding: 10 },
-  mensajeText:  { color: Colors.white, fontSize: 13, textAlign: 'center', fontWeight: '600' },
-
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: Colors.text, marginBottom: 12 },
-  empty:        { color: Colors.textMuted, fontSize: 14, textAlign: 'center', marginTop: 12, lineHeight: 20 },
+  mensajeBadge: { backgroundColor: Colors.background, borderRadius: 8, padding: 10 }, // <-- Fondo clarito
+  mensajeText:  { color: Colors.primary, fontSize: 13, textAlign: 'center', fontWeight: '600' }, // <-- Mensaje de éxito en rojo
 });

@@ -3,13 +3,18 @@ import {
   View, Text, ScrollView, StyleSheet,
   ActivityIndicator, RefreshControl, TouchableOpacity,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Redirect } from 'expo-router'; // <-- 1. Importamos Redirect
 import { Colors } from '@/constants/Colors';
 import { InsightCard } from '@/components/InsightCard';
 import { api, Insight, DEMO_CUSTOMER_ID } from '@/services/api';
+import { useAuth } from '../../api/authContext';
 
 export default function HomeScreen() {
-  const router   = useRouter();
+  const router = useRouter();
+  const { user } = useAuth();
+  
+  const isLogged = !!user; 
+  
   const [insights,    setInsights]    = useState<Insight[]>([]);
   const [goalText,    setGoalText]    = useState<string | null>(null);
   const [progressPct, setProgressPct] = useState<number>(0);
@@ -34,13 +39,24 @@ export default function HomeScreen() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { 
+    // Solo cargamos los datos si el usuario ya inició sesión
+    if (isLogged) {
+      load(); 
+    }
+  }, [isLogged]);
 
+  // 2. LA SOLUCIÓN: Usar el componente Redirect en lugar de router.replace
+  if (!isLogged) {
+    return <Redirect href="/login" />;
+  }
+
+  // Si está cargando datos, mostramos el ActivityIndicator
   if (loading) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color={Colors.primary} />
-        <Text style={styles.loadingText}>Preparando tus insights...</Text>
+        <Text style={styles.loadingText}>Verificando sesión...</Text>
       </View>
     );
   }
