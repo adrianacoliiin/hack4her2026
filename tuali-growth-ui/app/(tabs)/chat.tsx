@@ -4,6 +4,8 @@ import {
   FlatList, StyleSheet, KeyboardAvoidingView,
   Platform, ActivityIndicator,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { ChatBubble } from '@/components/ChatBubble';
@@ -138,11 +140,20 @@ export default function ChatScreen() {
           onSubmitEditing={() => send()}
         />
         <TouchableOpacity
-          style={[styles.sendBtn, (!input.trim() || loading) && styles.sendBtnDisabled]}
           onPress={() => send()}
           disabled={!input.trim() || loading}
+          activeOpacity={0.8}
         >
-          <Text style={styles.sendIcon}>➤</Text>
+          <LinearGradient
+            colors={(!input.trim() || loading)
+              ? [Colors.border, Colors.border]
+              : [Colors.primary, Colors.primaryDark]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.sendBtn}
+          >
+            <Ionicons name="send" size={18} color={Colors.white} />
+          </LinearGradient>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -170,42 +181,51 @@ const styles = StyleSheet.create({
     paddingBottom:  4,
   },
   chip: {
-    backgroundColor: Colors.card,
-    borderRadius:    20,
-    borderWidth:     1,
-    borderColor:     Colors.primary,
-    paddingHorizontal: 12,
-    paddingVertical:   6,
+    backgroundColor:   Colors.white,
+    borderRadius:      20,
+    borderWidth:       1.5,
+    borderColor:       Colors.primary + '60',
+    paddingHorizontal: 14,
+    paddingVertical:   7,
+    shadowColor:       Colors.primary,
+    shadowOpacity:     0.1,
+    shadowRadius:      4,
+    shadowOffset:      { width: 0, height: 1 },
+    elevation:         1,
   },
-  chipText: { fontSize: 12, color: Colors.primary, fontWeight: '600' },
+  chipText: { fontSize: 12, color: Colors.primary, fontWeight: '700' },
 
   inputRow: {
-    flexDirection:  'row',
-    alignItems:     'flex-end',
-    padding:        12,
-    gap:            8,
+    flexDirection:   'row',
+    alignItems:      'flex-end',
+    padding:         12,
+    gap:             8,
     backgroundColor: Colors.white,
     borderTopWidth:  1,
     borderTopColor:  Colors.border,
   },
   input: {
-    flex:            1,
-    backgroundColor: Colors.background,
-    borderRadius:    20,
+    flex:              1,
+    backgroundColor:   Colors.background,
+    borderRadius:      22,
     paddingHorizontal: 16,
     paddingVertical:   10,
-    fontSize:        14,
-    color:           Colors.text,
-    maxHeight:       100,
+    fontSize:          14,
+    color:             Colors.text,
+    maxHeight:         100,
+    borderWidth:       1,
+    borderColor:       Colors.border,
   },
   sendBtn: {
-    backgroundColor: Colors.primary,
-    width:           42,
-    height:          42,
-    borderRadius:    21,
-    justifyContent:  'center',
-    alignItems:      'center',
+    width:          42,
+    height:         42,
+    borderRadius:   21,
+    justifyContent: 'center',
+    alignItems:     'center',
+    shadowColor:    Colors.primary,
+    shadowOpacity:  0.3,
+    shadowRadius:   6,
+    shadowOffset:   { width: 0, height: 2 },
+    elevation:      3,
   },
-  sendBtnDisabled: { backgroundColor: Colors.border },
-  sendIcon:        { color: Colors.white, fontSize: 16 },
 });

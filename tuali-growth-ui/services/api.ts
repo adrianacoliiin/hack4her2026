@@ -156,6 +156,17 @@ export const api = {
     });
   },
 
+  // Conteo de notificaciones (para badge)
+  getNotifCount: async (customerId: number): Promise<number> => {
+    try {
+      const res  = await fetch(`${BASE_URL}/notifications/${customerId}`);
+      const data = await res.json();
+      return (data.notificaciones ?? []).length;
+    } catch {
+      return 0;
+    }
+  },
+
   // Ranking de la zona
   getRanking: async (customerId: number): Promise<Ranking | null> => {
     const res = await fetch(`${BASE_URL}/ranking/${customerId}`);

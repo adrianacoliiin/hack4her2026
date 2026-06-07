@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useLayoutEffect } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, Modal, Pressable,
   ActivityIndicator, RefreshControl, TouchableOpacity,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, Redirect } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
+import Ionicons from '@expo/vector-icons/build/Ionicons';
 import { Colors } from '@/constants/Colors';
 import { InsightCard } from '@/components/InsightCard';
 import { api, Insight, Rewards } from '@/services/api';
@@ -27,26 +30,66 @@ export default function HomeScreen() {
   const isLogged   = !!user;
   const customerId = user?.customer_id ?? 0;
 
+  const navigation = useNavigation();
+
   const [insights,    setInsights]    = useState<Insight[]>([]);
   const [goalText,    setGoalText]    = useState<string | null>(null);
   const [progressPct, setProgressPct] = useState<number>(0);
   const [rewards,     setRewards]     = useState<Rewards | null>(null);
+  const [notifCount,  setNotifCount]  = useState(0);
   const [loading,     setLoading]     = useState(true);
   const [refreshing,  setRefreshing]  = useState(false);
   const [selected,    setSelected]    = useState<Insight | null>(null);
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginRight: 8 }}>
+          <TouchableOpacity
+            onPress={() => router.push('/(tabs)/notificaciones')}
+            style={{ padding: 6 }}
+          >
+            <View>
+              <Ionicons name="notifications-outline" size={24} color={Colors.white} />
+              {notifCount > 0 && (
+                <View style={{
+                  position: 'absolute', top: -2, right: -2,
+                  backgroundColor: Colors.warning,
+                  borderRadius: 8, minWidth: 16, height: 16,
+                  justifyContent: 'center', alignItems: 'center', paddingHorizontal: 2,
+                }}>
+                  <Text style={{ color: Colors.white, fontSize: 9, fontWeight: '800' }}>
+                    {notifCount > 9 ? '9+' : notifCount}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push('/(tabs)/perfil')}
+            style={{ padding: 6 }}
+          >
+            <Ionicons name="settings-outline" size={24} color={Colors.white} />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, [notifCount, navigation, router]);
+
   const load = async () => {
     try {
-      const [ins, goal, progress, rw] = await Promise.all([
+      const [ins, goal, progress, rw, count] = await Promise.all([
         api.getInsights(customerId),
         api.getGoal(customerId),
         api.getProgress(customerId),
         api.getRewards(customerId),
+        api.getNotifCount(customerId),
       ]);
       setInsights(ins);
       setGoalText(goal?.goal_text ?? null);
       setProgressPct(progress?.semana_actual.tasa_completitud_pct ?? 0);
       setRewards(rw);
+      setNotifCount(count);
     } catch (e) {
       console.error(e);
     } finally {
@@ -79,17 +122,28 @@ export default function HomeScreen() {
       >
         {/* Meta activa */}
         {goalText ? (
-          <TouchableOpacity style={styles.goalBanner} onPress={() => router.push('/meta')}>
-            <Text style={styles.goalLabel}>🎯 Mi meta activa</Text>
-            <Text style={styles.goalText}>{goalText}</Text>
-            <View style={styles.progressBar}>
-              <View style={[styles.progressFill, { width: `${progressPct}%` }]} />
-            </View>
-            <Text style={styles.progressLabel}>{progressPct}% completado esta semana</Text>
+          <TouchableOpacity onPress={() => router.push('/meta')} activeOpacity={0.9}>
+            <LinearGradient
+              colors={[Colors.primary, Colors.primaryMid, Colors.primaryDark]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.goalBanner}
+            >
+              <View style={styles.goalLabelRow}>
+                <Ionicons name="flag-outline" size={14} color="rgba(255,255,255,0.85)" />
+                <Text style={styles.goalLabel}>Mi meta activa</Text>
+              </View>
+              <Text style={styles.goalText}>{goalText}</Text>
+              <View style={styles.progressBar}>
+                <View style={[styles.progressFill, { width: `${progressPct}%` }]} />
+              </View>
+              <Text style={styles.progressLabel}>{progressPct}% completado esta semana</Text>
+            </LinearGradient>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity style={styles.goalBannerEmpty} onPress={() => router.push('/meta')}>
-            <Text style={styles.goalEmptyText}>🎯 Define tu meta de negocio</Text>
+          <TouchableOpacity style={styles.goalBannerEmpty} onPress={() => router.push('/meta')} activeOpacity={0.8}>
+            <Ionicons name="flag-outline" size={28} color={Colors.primary} />
+            <Text style={styles.goalEmptyText}>Define tu meta de negocio</Text>
             <Text style={styles.goalEmptySubtext}>El agente te ayudará a llegar →</Text>
           </TouchableOpacity>
         )}
@@ -97,42 +151,55 @@ export default function HomeScreen() {
         {/* Trayectoria de crecimiento */}
         {rewards && (
           <View style={styles.rewardsCard}>
-            <View style={styles.rewardsHeader}>
-              <Text style={styles.rewardsTitle}>Trayectoria de Crecimiento</Text>
+            <LinearGradient
+              colors={['#1A1A2E', '#16213E', '#0F3460']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.rewardsGradientHeader}
+            >
+              <View>
+                <Text style={styles.rewardsTitleDark}>Trayectoria de Crecimiento</Text>
+                <Text style={styles.rewardsSubtitleDark}>Programa Sabritas</Text>
+              </View>
               <View style={styles.rewardsBadge}>
                 <Text style={styles.rewardsBadgeText}>
-                  {rewards.nivel_emoji} {rewards.nivel}
+                  {rewards.nivel_emoji}  {rewards.nivel}
                 </Text>
               </View>
-            </View>
-            <View style={styles.rewardsRow}>
-              <View style={styles.rewardsStat}>
-                <Text style={styles.rewardsStatValue}>{rewards.cajas_mes_promedio}</Text>
-                <Text style={styles.rewardsStatLabel}>cajas/mes</Text>
+            </LinearGradient>
+            <View style={styles.rewardsBody}>
+              <View style={styles.rewardsRow}>
+                <View style={styles.rewardsStat}>
+                  <Text style={styles.rewardsStatValue}>{rewards.cajas_mes_promedio}</Text>
+                  <Text style={styles.rewardsStatLabel}>cajas/mes</Text>
+                </View>
+                <View style={styles.rewardsDivider} />
+                <View style={styles.rewardsStat}>
+                  <Text style={styles.rewardsStatValue}>{rewards.meta_mes}</Text>
+                  <Text style={styles.rewardsStatLabel}>meta del mes</Text>
+                </View>
+                {rewards.nivel_descuento > 0 && (
+                  <>
+                    <View style={styles.rewardsDivider} />
+                    <View style={styles.rewardsStat}>
+                      <Text style={[styles.rewardsStatValue, { color: Colors.success }]}>
+                        {rewards.nivel_descuento}%
+                      </Text>
+                      <Text style={styles.rewardsStatLabel}>descuento</Text>
+                    </View>
+                  </>
+                )}
               </View>
-              <View style={styles.rewardsDivider} />
-              <View style={styles.rewardsStat}>
-                <Text style={styles.rewardsStatValue}>{rewards.meta_mes}</Text>
-                <Text style={styles.rewardsStatLabel}>meta del mes</Text>
-              </View>
-              {rewards.nivel_descuento > 0 && (
-                <>
-                  <View style={styles.rewardsDivider} />
-                  <View style={styles.rewardsStat}>
-                    <Text style={[styles.rewardsStatValue, { color: Colors.success }]}>
-                      {rewards.nivel_descuento}%
-                    </Text>
-                    <Text style={styles.rewardsStatLabel}>descuento</Text>
-                  </View>
-                </>
+              <Text style={styles.rewardsBeneficio}>{rewards.nivel_beneficio}</Text>
+              {rewards.nivel_siguiente && (
+                <View style={styles.rewardsNextRow}>
+                  <Ionicons name="trending-up-outline" size={14} color={Colors.primary} />
+                  <Text style={styles.rewardsNext}>
+                    Faltan {rewards.cajas_faltantes} cajas para {rewards.nivel_siguiente}
+                  </Text>
+                </View>
               )}
             </View>
-            <Text style={styles.rewardsBeneficio}>{rewards.nivel_beneficio}</Text>
-            {rewards.nivel_siguiente && (
-              <Text style={styles.rewardsNext}>
-                Faltan {rewards.cajas_faltantes} cajas para {rewards.nivel_siguiente}
-              </Text>
-            )}
           </View>
         )}
 
@@ -150,8 +217,16 @@ export default function HomeScreen() {
           ))
         )}
 
-        <TouchableOpacity style={styles.chatBtn} onPress={() => router.push('/chat')}>
-          <Text style={styles.chatBtnText}>🤖 Hablar con el agente</Text>
+        <TouchableOpacity onPress={() => router.push('/chat')} activeOpacity={0.85}>
+          <LinearGradient
+            colors={[Colors.primary, Colors.primaryDark]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.chatBtn}
+          >
+            <Ionicons name="chatbubble-ellipses-outline" size={20} color={Colors.white} />
+            <Text style={styles.chatBtnText}>Hablar con el agente</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </ScrollView>
 
@@ -243,63 +318,88 @@ const styles = StyleSheet.create({
   loadingText:  { color: Colors.textLight, fontSize: 14 },
 
   goalBanner: {
-    backgroundColor: Colors.primary,
-    borderRadius:    14,
-    padding:         16,
-    marginBottom:    20,
+    borderRadius:  16,
+    padding:       18,
+    marginBottom:  20,
+    shadowColor:   Colors.primary,
+    shadowOpacity: 0.3,
+    shadowRadius:  12,
+    shadowOffset:  { width: 0, height: 5 },
+    elevation:     5,
   },
-  goalLabel:     { color: 'rgba(255,255,255,0.8)', fontSize: 12, fontWeight: '600', marginBottom: 4 },
-  goalText:      { color: Colors.white, fontSize: 16, fontWeight: '700', marginBottom: 12 },
-  progressBar:   { backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: 4, height: 6, marginBottom: 6 },
-  progressFill:  { backgroundColor: Colors.white, borderRadius: 4, height: 6 },
-  progressLabel: { color: 'rgba(255,255,255,0.85)', fontSize: 12 },
+  goalLabelRow:  { flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 6 },
+  goalLabel:     { color: 'rgba(255,255,255,0.85)', fontSize: 12, fontWeight: '700' },
+  goalText:      { color: Colors.white, fontSize: 17, fontWeight: '800', marginBottom: 14, lineHeight: 23 },
+  progressBar:   { backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: 6, height: 7, marginBottom: 7 },
+  progressFill:  { backgroundColor: Colors.white, borderRadius: 6, height: 7 },
+  progressLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 12, fontWeight: '600' },
 
   goalBannerEmpty: {
     backgroundColor: Colors.card,
-    borderRadius:    14,
+    borderRadius:    16,
     borderWidth:     2,
     borderColor:     Colors.primary,
     borderStyle:     'dashed',
-    padding:         16,
+    padding:         20,
     marginBottom:    20,
     alignItems:      'center',
+    gap:             6,
   },
-  goalEmptyText:    { fontSize: 16, fontWeight: '700', color: Colors.primary, marginBottom: 4 },
+  goalEmptyText:    { fontSize: 16, fontWeight: '800', color: Colors.primary },
   goalEmptySubtext: { fontSize: 13, color: Colors.textLight },
 
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: Colors.text, marginBottom: 12 },
+  sectionTitle: { fontSize: 18, fontWeight: '800', color: Colors.text, marginBottom: 12, letterSpacing: -0.3 },
   empty:        { color: Colors.textMuted, fontSize: 14, textAlign: 'center', marginTop: 20 },
 
   chatBtn: {
-    backgroundColor: Colors.primary,
-    borderRadius:    14,
-    padding:         16,
-    alignItems:      'center',
-    marginTop:       8,
+    flexDirection:  'row',
+    alignItems:     'center',
+    justifyContent: 'center',
+    gap:            10,
+    borderRadius:   16,
+    padding:        16,
+    marginTop:      8,
+    shadowColor:    Colors.primary,
+    shadowOpacity:  0.35,
+    shadowRadius:   10,
+    shadowOffset:   { width: 0, height: 4 },
+    elevation:      4,
   },
-  chatBtnText: { color: Colors.white, fontSize: 16, fontWeight: '700' },
+  chatBtnText: { color: Colors.white, fontSize: 16, fontWeight: '800', letterSpacing: 0.2 },
 
   // Rewards
   rewardsCard: {
     backgroundColor: Colors.card,
-    borderRadius:    14,
+    borderRadius:    16,
     borderWidth:     1,
     borderColor:     Colors.border,
-    padding:         14,
     marginBottom:    20,
-    gap:             10,
+    overflow:        'hidden',
+    shadowColor:     '#000',
+    shadowOpacity:   0.06,
+    shadowRadius:    8,
+    shadowOffset:    { width: 0, height: 2 },
+    elevation:       2,
   },
-  rewardsHeader:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  rewardsTitle:     { fontSize: 13, fontWeight: '700', color: Colors.text },
-  rewardsBadge:     { backgroundColor: Colors.primary + '15', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 },
-  rewardsBadgeText: { fontSize: 12, fontWeight: '700', color: Colors.primary },
+  rewardsGradientHeader: {
+    flexDirection:  'row',
+    justifyContent: 'space-between',
+    alignItems:     'center',
+    padding:        16,
+  },
+  rewardsTitleDark:    { fontSize: 13, fontWeight: '800', color: Colors.white, marginBottom: 2 },
+  rewardsSubtitleDark: { fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.8 },
+  rewardsBadge:     { backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 },
+  rewardsBadgeText: { fontSize: 13, fontWeight: '800', color: Colors.white },
+  rewardsBody:      { padding: 14, gap: 10 },
   rewardsRow:       { flexDirection: 'row', alignItems: 'center', gap: 12 },
   rewardsStat:      { alignItems: 'center', flex: 1 },
-  rewardsStatValue: { fontSize: 22, fontWeight: '800', color: Colors.text },
+  rewardsStatValue: { fontSize: 24, fontWeight: '800', color: Colors.text },
   rewardsStatLabel: { fontSize: 11, color: Colors.textMuted, marginTop: 1 },
-  rewardsDivider:   { width: 1, height: 32, backgroundColor: Colors.border },
+  rewardsDivider:   { width: 1, height: 36, backgroundColor: Colors.border },
   rewardsBeneficio: { fontSize: 12, color: Colors.textLight, fontStyle: 'italic' },
-  rewardsNext:      { fontSize: 12, fontWeight: '600', color: Colors.primary },
+  rewardsNextRow:   { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  rewardsNext:      { fontSize: 12, fontWeight: '700', color: Colors.primary },
 
   // Modal
   modalOverlay: {

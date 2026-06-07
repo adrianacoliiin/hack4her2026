@@ -21,8 +21,11 @@ export default function TabLayout() {
           backgroundColor: Colors.white,
           borderTopColor:  Colors.border,
           paddingBottom:   4,
-          height:          62,
+          height:          58,
         },
+        tabBarItemStyle:  { flex: 1 },
+        tabBarLabelStyle: { fontSize: 10, fontWeight: '600' },
+        tabBarIconStyle:  { marginBottom: -2 },
         headerStyle:      { backgroundColor: Colors.primary },
         headerTintColor:  Colors.white,
         headerTitleStyle: { fontWeight: '700' },
@@ -31,9 +34,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="notificaciones"
         options={{
-          title:       'Alertas',
-          tabBarIcon:  () => <TabIcon emoji="🔔" />,
           headerTitle: 'Notificaciones',
+          href:        null,
         }}
       />
       <Tabs.Screen
@@ -55,8 +57,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="meta"
         options={{
-          title:       'Mi Meta',
-          tabBarIcon:  ({ color }) => <Ionicons name="rocket" size={24} color={color} />,
+          title:       'Meta',
+          tabBarIcon:  ({ color }) => <Ionicons name="rocket" size={22} color={color} />,
           headerTitle: 'Mi Meta de Negocio',
         }}
       />

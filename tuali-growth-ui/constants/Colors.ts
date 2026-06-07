@@ -1,6 +1,7 @@
 export const Colors = {
-  primary:    '#d91c34',   // Rojo Tuali
-  primaryDark:'#B8001A',
+  primary:    '#d91c34',
+  primaryDark:'#8B0000',
+  primaryMid: '#c0152a',
   white:      '#FFFFFF',
   background: '#F5F5F5',
   card:       '#FFFFFF',

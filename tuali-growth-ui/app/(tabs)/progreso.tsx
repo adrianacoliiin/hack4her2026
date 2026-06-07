@@ -3,6 +3,7 @@ import {
   View, Text, FlatList, StyleSheet,
   ActivityIndicator, RefreshControl, Alert,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/constants/Colors';
 import { ActionItem } from '@/components/ActionItem';
 import { api, Action, Progress, Ranking } from '@/services/api';
@@ -101,15 +102,23 @@ export default function ProgresoScreen() {
           {/* Torneo de la zona */}
           {ranking && (
             <View style={styles.torneoCard}>
-              <View style={styles.torneoHeader}>
-                <Text style={styles.torneoTitle}>🏆 Torneo de tu zona</Text>
+              <LinearGradient
+                colors={['#1A1A2E', '#16213E', '#0F3460']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.torneoGradientHeader}
+              >
+                <View>
+                  <Text style={styles.torneoTitleDark}>🏆 Torneo de tu zona</Text>
+                  <Text style={styles.torneoCedisDark}>Región CEDIS {ranking.cedis}</Text>
+                </View>
                 <View style={styles.torneoBadge}>
                   <Text style={styles.torneoBadgeText}>
                     #{ranking.mi_posicion ?? '?'} de {ranking.total_tiendas_zona}
                   </Text>
                 </View>
-              </View>
-              <Text style={styles.torneoCedis}>Región CEDIS {ranking.cedis}</Text>
+              </LinearGradient>
+              <View style={styles.torneoBody}>
 
               {ranking.ranking.slice(0, 5).map((entry) => (
                 <View
@@ -161,6 +170,7 @@ export default function ProgresoScreen() {
                   </Text>
                 </View>
               )}
+              </View>
             </View>
           )}
 
@@ -218,21 +228,27 @@ const styles = StyleSheet.create({
   torneoCard: {
     backgroundColor: Colors.card,
     borderRadius:    16,
-    padding:         16,
     marginBottom:    16,
     borderWidth:     1,
     borderColor:     Colors.border,
-    gap:             10,
+    overflow:        'hidden',
+    shadowColor:     '#000',
+    shadowOpacity:   0.07,
+    shadowRadius:    8,
+    shadowOffset:    { width: 0, height: 3 },
+    elevation:       3,
   },
-  torneoHeader: {
+  torneoGradientHeader: {
     flexDirection:  'row',
     justifyContent: 'space-between',
     alignItems:     'center',
+    padding:        16,
   },
-  torneoTitle:      { fontSize: 15, fontWeight: '700', color: Colors.text },
-  torneoBadge:      { backgroundColor: Colors.primary + '18', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3 },
-  torneoBadgeText:  { fontSize: 12, fontWeight: '700', color: Colors.primary },
-  torneoCedis:      { fontSize: 11, color: Colors.textMuted, marginTop: -4 },
+  torneoTitleDark:  { fontSize: 15, fontWeight: '800', color: Colors.white, marginBottom: 2 },
+  torneoCedisDark:  { fontSize: 11, color: 'rgba(255,255,255,0.6)', fontWeight: '600' },
+  torneoBody:       { padding: 12, gap: 6 },
+  torneoBadge:      { backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 5 },
+  torneoBadgeText:  { fontSize: 12, fontWeight: '800', color: Colors.white },
 
   rankRow: {
     flexDirection:  'row',
