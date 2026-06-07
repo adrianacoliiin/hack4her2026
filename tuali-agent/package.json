@@ -1,0 +1,20 @@
+{
+  "name": "tuali-growth-agent",
+  "version": "1.0.0",
+  "description": "Tuali Growth Agent — microservicio Express + Gemini",
+  "main": "src/index.js",
+  "scripts": {
+    "dev":   "nodemon src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "groq-sdk": "^0.9.0",
+    "cors":                  "^2.8.5",
+    "dotenv":                "^16.4.5",
+    "express":               "^4.19.2",
+    "mongodb":               "^6.8.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}

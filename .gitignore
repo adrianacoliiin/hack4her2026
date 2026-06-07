@@ -1,0 +1,21 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Variables de entorno
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+seed_mongo.py
+package-lock.json
+
+# Data files
+*.csv
