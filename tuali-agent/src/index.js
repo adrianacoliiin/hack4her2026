@@ -20,6 +20,8 @@ const actionsRoute = require('./routes/actions');
 
 const notificationsRoute = require('./routes/notifications');
 const rewardsRoute       = require('./routes/rewards');
+const authRoute          = require('./routes/auth');
+const rankingRoute       = require('./routes/ranking');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -31,6 +33,8 @@ app.use('/goals',   goalsRoute);
 app.use('/actions', actionsRoute);
 app.use('/notifications', notificationsRoute);
 app.use('/rewards',       rewardsRoute);
+app.use('/auth',          authRoute);
+app.use('/ranking',       rankingRoute);
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => {

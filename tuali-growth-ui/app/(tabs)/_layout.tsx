@@ -2,12 +2,16 @@ import { Tabs } from 'expo-router';
 import { Text } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import Ionicons from '@expo/vector-icons/build/Ionicons';
+import { useAuth } from '../../api/authContext';
 
 function TabIcon({ emoji }: { emoji: string }) {
   return <Text style={{ fontSize: 20 }}>{emoji}</Text>;
 }
 
 export default function TabLayout() {
+  const { user } = useAuth();
+  const firstName = user?.name?.split(' ')[0] ?? 'tendero';
+
   return (
     <Tabs
       screenOptions={{
@@ -37,7 +41,7 @@ export default function TabLayout() {
         options={{
           title:       'Inicio',
           tabBarIcon:  ({ color }) => <Ionicons name="home-outline" size={24} color={color} />,
-          headerTitle: '¡Hola, tendero! 👋',
+          headerTitle: `¡Hola, ${firstName}! 👋`,
         }}
       />
       <Tabs.Screen

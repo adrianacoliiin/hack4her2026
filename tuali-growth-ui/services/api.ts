@@ -6,10 +6,12 @@ export const DEMO_CUSTOMER_ID = 7539780000000000000;
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 export type Insight = {
-  titulo:  string;
-  accion:  string;
-  impacto: string;
-  tipo:    'pedido' | 'promo' | 'zona';
+  titulo:     string;
+  accion:     string;
+  impacto:    string;
+  tipo:       'pedido' | 'promo' | 'zona';
+  estrategia?: string;
+  pasos?:      string[];
 };
 
 export type Message = {
@@ -40,6 +42,21 @@ export type Action = {
   status:         'pending' | 'completed' | 'skipped';
   recommended_at: string;
   completed_at:   string | null;
+};
+
+export type RankingEntry = {
+  posicion:       number;
+  nombre:         string;
+  cajas_mes:      number;
+  es_usuario:     boolean;
+  pct_del_lider:  number;
+};
+
+export type Ranking = {
+  cedis:               string;
+  total_tiendas_zona:  number;
+  mi_posicion:         number | null;
+  ranking:             RankingEntry[];
 };
 
 export type Rewards = {
@@ -77,15 +94,16 @@ export const api = {
 
   // Enviar mensaje al agente
   sendMessage: async (
-    customerId: number,
-    message:    string,
-    history:    Message[],
-    goal?:      string,
+    customerId:  number,
+    message:     string,
+    history:     Message[],
+    goal?:       string,
+    personaType?: string,
   ): Promise<{ reply: string; goal_id?: string }> => {
     const res = await fetch(`${BASE_URL}/chat`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ customer_id: customerId, message, history, goal }),
+      body:    JSON.stringify({ customer_id: customerId, message, history, goal, persona_type: personaType }),
     });
     return res.json();
   },
@@ -136,6 +154,13 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ status, feedback }),
     });
+  },
+
+  // Ranking de la zona
+  getRanking: async (customerId: number): Promise<Ranking | null> => {
+    const res = await fetch(`${BASE_URL}/ranking/${customerId}`);
+    if (!res.ok) return null;
+    return res.json();
   },
 
   // Puntos de recompensa

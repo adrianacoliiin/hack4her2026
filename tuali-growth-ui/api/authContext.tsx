@@ -1,21 +1,30 @@
 import React, { createContext, useState, useContext } from 'react';
 
-// Creamos el contexto
-const AuthContext = createContext<any>(null);
+export type UserProfile = {
+  name:         string;
+  email:        string;
+  persona_type: 'eficiencia' | 'asistido' | 'familiar';
+  customer_id:  number;
+  role:         string;
+};
 
-// Proveedor del contexto que envolverá la app
+type AuthContextType = {
+  user:   UserProfile | null;
+  login:  (userData: UserProfile) => void;
+  logout: () => void;
+};
+
+const AuthContext = createContext<AuthContextType>({
+  user:   null,
+  login:  () => {},
+  logout: () => {},
+});
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
 
-  // Esta es la función que tu login.tsx llama al hacer: const { login: setUserContext } = useAuth();
-  const login = (userData: any) => {
-    setUser(userData);
-  };
-
-  // Función para cerrar sesión (la usarás más adelante)
-  const logout = () => {
-    setUser(null);
-  };
+  const login  = (userData: UserProfile) => setUser(userData);
+  const logout = () => setUser(null);
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
@@ -24,5 +33,4 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-// Hook personalizado para usar el contexto fácilmente
 export const useAuth = () => useContext(AuthContext);

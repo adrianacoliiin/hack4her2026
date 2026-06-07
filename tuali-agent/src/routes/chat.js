@@ -15,7 +15,7 @@ const { ObjectId } = require('mongodb');
  * }
  */
 router.post('/', async (req, res) => {
-  const { customer_id, message, goal, goal_id, history = [] } = req.body;
+  const { customer_id, message, goal, goal_id, history = [], persona_type } = req.body;
 
   if (!customer_id || !message) {
     return res.status(400).json({ error: 'customer_id y message son requeridos.' });
@@ -45,7 +45,8 @@ router.post('/', async (req, res) => {
       message,
       history,
       customerContext,
-      goal: activeGoalText,
+      goal:        activeGoalText,
+      personaType: persona_type ?? null,
     });
 
     // Auto-registrar la respuesta del agente como acción pendiente

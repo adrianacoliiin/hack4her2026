@@ -7,7 +7,8 @@ import {
 import { useLocalSearchParams } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { ChatBubble } from '@/components/ChatBubble';
-import { api, Message, DEMO_CUSTOMER_ID } from '@/services/api';
+import { api, Message } from '@/services/api';
+import { useAuth } from '../../api/authContext';
 
 const SUGGESTIONS = [
   '¿Qué debería pedir esta semana?',
@@ -16,10 +17,28 @@ const SUGGESTIONS = [
   'No me llegó la Coca-Cola, ¿qué vendo?',
 ];
 
+const FOLLOW_UPS = [
+  '¿Cómo lo aplico esta semana?',
+  '¿Puedes darme más detalle?',
+  '¿Cuánto podría ganar con eso?',
+  '¿Qué más puedo mejorar?',
+  '¿Tienes otra recomendación?',
+];
+
 export default function ChatScreen() {
-  const params             = useLocalSearchParams<{ prefill?: string }>();
+  const params  = useLocalSearchParams<{ prefill?: string }>();
+  const { user } = useAuth();
+  const customerId  = user?.customer_id ?? 0;
+  const personaType = user?.persona_type;
+
+  const greeting = personaType === 'asistido'
+    ? `¡Hola! Soy tu agente de Tuali 🤖\n¿Qué necesitas hoy?`
+    : personaType === 'familiar'
+    ? `¡Hola! Soy tu agente de crecimiento 🤖\n¿En qué te ayudo hoy?`
+    : `¡Hola! Soy tu agente de crecimiento 🤖\n¿En qué te puedo ayudar hoy?`;
+
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: '¡Hola! Soy tu agente de crecimiento 🤖\n¿En qué te puedo ayudar hoy?' },
+    { role: 'assistant', content: greeting },
   ]);
   const [input,   setInput]   = useState(params.prefill ?? '');
   const [loading, setLoading] = useState(false);
@@ -42,9 +61,11 @@ export default function ChatScreen() {
 
     try {
       const { reply } = await api.sendMessage(
-        DEMO_CUSTOMER_ID,
+        customerId,
         msg,
         history,
+        undefined,
+        personaType,
       );
       setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
     } catch {
@@ -82,8 +103,8 @@ export default function ChatScreen() {
         </View>
       )}
 
-      {/* Sugerencias rápidas (solo al inicio) */}
-      {messages.length === 1 && (
+      {/* Sugerencias: todas al inicio, 1 follow-up tras cada respuesta del agente */}
+      {messages.length === 1 ? (
         <View style={styles.suggestions}>
           {SUGGESTIONS.map((s, i) => (
             <TouchableOpacity key={i} style={styles.chip} onPress={() => send(s)}>
@@ -91,7 +112,18 @@ export default function ChatScreen() {
             </TouchableOpacity>
           ))}
         </View>
-      )}
+      ) : messages[messages.length - 1]?.role === 'assistant' && !loading ? (
+        <View style={styles.suggestions}>
+          <TouchableOpacity
+            style={styles.chip}
+            onPress={() => send(FOLLOW_UPS[Math.floor(messages.length / 2) % FOLLOW_UPS.length])}
+          >
+            <Text style={styles.chipText}>
+              {FOLLOW_UPS[Math.floor(messages.length / 2) % FOLLOW_UPS.length]}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
 
       {/* Input */}
       <View style={styles.inputRow}>

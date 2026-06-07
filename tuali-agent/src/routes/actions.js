@@ -90,12 +90,13 @@ router.get('/:customer_id', async (req, res) => {
     const filter = { customer_id: Number(customer_id) };
     if (status) filter.status = status;
 
-    const acciones = await db.collection('action_log')
+    const docs = await db.collection('action_log')
       .find(filter)
       .sort({ recommended_at: -1 })
       .limit(20)
       .toArray();
 
+    const acciones = docs.map(a => ({ ...a, action_id: a._id.toString() }));
     res.json({ customer_id, total: acciones.length, acciones });
 
   } catch (err) {

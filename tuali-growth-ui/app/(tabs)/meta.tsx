@@ -4,7 +4,8 @@ import {
   StyleSheet, ScrollView, ActivityIndicator, Alert,
 } from 'react-native';
 import { Colors } from '@/constants/Colors';
-import { api, Goal, DEMO_CUSTOMER_ID } from '@/services/api';
+import { api, Goal } from '@/services/api';
+import { useAuth } from '../../api/authContext';
 
 const GOAL_TYPES = [
   { key: 'ventas',          label: '📈 Aumentar ventas' },
@@ -13,6 +14,8 @@ const GOAL_TYPES = [
 ];
 
 export default function MetaScreen() {
+  const { user }    = useAuth();
+  const customerId  = user?.customer_id ?? 0;
   const [goal,        setGoal]        = useState<Goal | null>(null);
   const [loading,     setLoading]     = useState(true);
   const [saving,      setSaving]      = useState(false);
@@ -25,7 +28,7 @@ export default function MetaScreen() {
 
   const loadGoal = async () => {
     try {
-      const g = await api.getGoal(DEMO_CUSTOMER_ID);
+      const g = await api.getGoal(customerId);
       setGoal(g);
       if (g) {
         setGoalText(g.goal_text);
@@ -44,7 +47,7 @@ export default function MetaScreen() {
     }
     setSaving(true);
     try {
-      await api.setGoal(DEMO_CUSTOMER_ID, goalText, goalType, Number(targetValue));
+      await api.setGoal(customerId, goalText, goalType, Number(targetValue));
       await loadGoal();
       setShowForm(false);
       Alert.alert('¡Meta guardada! 🎯', 'El agente usará esta meta para todas sus recomendaciones.');

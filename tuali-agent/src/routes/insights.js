@@ -33,9 +33,14 @@ Genera exactamente 3 insights de crecimiento para este tendero.
 Formato de respuesta — devuelve SOLO este JSON sin texto extra:
 {
   "insights": [
-    { "titulo": "...", "accion": "...", "impacto": "...", "tipo": "pedido|promo|zona" },
-    { "titulo": "...", "accion": "...", "impacto": "...", "tipo": "pedido|promo|zona" },
-    { "titulo": "...", "accion": "...", "impacto": "...", "tipo": "pedido|promo|zona" }
+    {
+      "titulo": "...",
+      "accion": "...",
+      "impacto": "...",
+      "tipo": "pedido|promo|zona",
+      "estrategia": "Explicación en 2-3 oraciones de POR QUÉ esta recomendación tiene sentido para este cliente.",
+      "pasos": ["Paso concreto 1", "Paso concreto 2", "Paso concreto 3"]
+    }
   ]
 }
 
@@ -44,6 +49,8 @@ Reglas:
 - "accion": qué debe hacer HOY, específico con SKUs y cantidades reales.
 - "impacto": beneficio esperado en pesos o porcentaje.
 - "tipo": "pedido" si es sobre qué pedir, "promo" si involucra promoción/loyalty, "zona" si compara con vecinos.
+- "estrategia": el razonamiento detrás, basado en los datos del cliente. Máximo 2 oraciones.
+- "pasos": exactamente 3 pasos accionables y ordenados para ejecutar la recomendación esta semana.
 - Usa los datos reales del cliente y su zona para hacerlos relevantes.
 ${goal ? `- Meta actual del cliente: ${goal}` : ''}
     `.trim();
