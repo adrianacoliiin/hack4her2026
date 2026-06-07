@@ -42,6 +42,18 @@ export type Action = {
   completed_at:   string | null;
 };
 
+export type Rewards = {
+  cajas_mes_promedio: number;
+  meta_mes:           number;
+  nivel:              string;
+  nivel_emoji:        string;
+  nivel_beneficio:    string;
+  nivel_descripcion:  string;
+  nivel_descuento:    number;
+  nivel_siguiente:    string | null;
+  cajas_faltantes:    number;
+};
+
 export type Progress = {
   meta_activa: string;
   semana_actual: {
@@ -124,6 +136,13 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ status, feedback }),
     });
+  },
+
+  // Puntos de recompensa
+  getRewards: async (customerId: number): Promise<Rewards | null> => {
+    const res = await fetch(`${BASE_URL}/rewards/${customerId}`);
+    if (!res.ok) return null;
+    return res.json();
   },
 
   // Progreso semanal

@@ -6,7 +6,7 @@ import {
 import { useRouter, Redirect } from 'expo-router'; // <-- 1. Importamos Redirect
 import { Colors } from '@/constants/Colors';
 import { InsightCard } from '@/components/InsightCard';
-import { api, Insight, DEMO_CUSTOMER_ID } from '@/services/api';
+import { api, Insight, Rewards, DEMO_CUSTOMER_ID } from '@/services/api';
 import { useAuth } from '../../api/authContext';
 
 export default function HomeScreen() {
@@ -18,19 +18,22 @@ export default function HomeScreen() {
   const [insights,    setInsights]    = useState<Insight[]>([]);
   const [goalText,    setGoalText]    = useState<string | null>(null);
   const [progressPct, setProgressPct] = useState<number>(0);
+  const [rewards,     setRewards]     = useState<Rewards | null>(null);
   const [loading,     setLoading]     = useState(true);
   const [refreshing,  setRefreshing]  = useState(false);
 
   const load = async () => {
     try {
-      const [ins, goal, progress] = await Promise.all([
+      const [ins, goal, progress, rw] = await Promise.all([
         api.getInsights(DEMO_CUSTOMER_ID),
         api.getGoal(DEMO_CUSTOMER_ID),
         api.getProgress(DEMO_CUSTOMER_ID),
+        api.getRewards(DEMO_CUSTOMER_ID),
       ]);
       setInsights(ins);
       setGoalText(goal?.goal_text ?? null);
       setProgressPct(progress?.semana_actual.tasa_completitud_pct ?? 0);
+      setRewards(rw);
     } catch (e) {
       console.error(e);
     } finally {
@@ -82,6 +85,51 @@ export default function HomeScreen() {
           <Text style={styles.goalEmptyText}>🎯 Define tu meta de negocio</Text>
           <Text style={styles.goalEmptySubtext}>El agente te ayudará a llegar →</Text>
         </TouchableOpacity>
+      )}
+
+      {/* Trayectoria de crecimiento */}
+      {rewards && (
+        <View style={styles.rewardsCard}>
+          <View style={styles.rewardsHeader}>
+            <Text style={styles.rewardsTitle}>Trayectoria de Crecimiento</Text>
+            <View style={styles.rewardsBadge}>
+              <Text style={styles.rewardsBadgeText}>
+                {rewards.nivel_emoji} {rewards.nivel}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.rewardsRow}>
+            <View style={styles.rewardsStat}>
+              <Text style={styles.rewardsStatValue}>{rewards.cajas_mes_promedio}</Text>
+              <Text style={styles.rewardsStatLabel}>cajas/mes</Text>
+            </View>
+            <View style={styles.rewardsDivider} />
+            <View style={styles.rewardsStat}>
+              <Text style={styles.rewardsStatValue}>{rewards.meta_mes}</Text>
+              <Text style={styles.rewardsStatLabel}>meta del mes</Text>
+            </View>
+            {rewards.nivel_descuento > 0 && (
+              <>
+                <View style={styles.rewardsDivider} />
+                <View style={styles.rewardsStat}>
+                  <Text style={[styles.rewardsStatValue, { color: Colors.success }]}>
+                    {rewards.nivel_descuento}%
+                  </Text>
+                  <Text style={styles.rewardsStatLabel}>descuento</Text>
+                </View>
+              </>
+            )}
+          </View>
+
+          <Text style={styles.rewardsBeneficio}>{rewards.nivel_beneficio}</Text>
+
+          {rewards.nivel_siguiente && (
+            <Text style={styles.rewardsNext}>
+              Faltan {rewards.cajas_faltantes} cajas para {rewards.nivel_siguiente}
+            </Text>
+          )}
+        </View>
       )}
 
       {/* Insights */}
@@ -148,4 +196,46 @@ const styles = StyleSheet.create({
     marginTop:       8,
   },
   chatBtnText: { color: Colors.white, fontSize: 16, fontWeight: '700' },
+
+  rewardsCard: {
+    backgroundColor: Colors.card,
+    borderRadius:    14,
+    borderWidth:     1,
+    borderColor:     Colors.border,
+    padding:         14,
+    marginBottom:    20,
+    gap:             10,
+  },
+  rewardsHeader: {
+    flexDirection:  'row',
+    justifyContent: 'space-between',
+    alignItems:     'center',
+  },
+  rewardsTitle: { fontSize: 13, fontWeight: '700', color: Colors.text },
+  rewardsBadge: {
+    backgroundColor: Colors.primary + '15',
+    borderRadius:    20,
+    paddingHorizontal: 10,
+    paddingVertical:   4,
+  },
+  rewardsBadgeText: { fontSize: 12, fontWeight: '700', color: Colors.primary },
+  rewardsRow: {
+    flexDirection:  'row',
+    alignItems:     'center',
+    gap:            12,
+  },
+  rewardsStat:      { alignItems: 'center', flex: 1 },
+  rewardsStatValue: { fontSize: 22, fontWeight: '800', color: Colors.text },
+  rewardsStatLabel: { fontSize: 11, color: Colors.textMuted, marginTop: 1 },
+  rewardsDivider: {
+    width:           1,
+    height:          32,
+    backgroundColor: Colors.border,
+  },
+  rewardsBeneficio: { fontSize: 12, color: Colors.textLight, fontStyle: 'italic' },
+  rewardsNext: {
+    fontSize:   12,
+    fontWeight: '600',
+    color:      Colors.primary,
+  },
 });
