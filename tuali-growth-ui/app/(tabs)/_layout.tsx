@@ -25,6 +25,14 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="notificaciones"
+        options={{
+          title:       'Alertas',
+          tabBarIcon:  () => <TabIcon emoji="🔔" />,
+          headerTitle: 'Notificaciones',
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
           title:       'Inicio',

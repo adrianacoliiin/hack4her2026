@@ -18,6 +18,8 @@ const insightsRoute = require('./routes/insights');
 const goalsRoute   = require('./routes/goals');
 const actionsRoute = require('./routes/actions');
 
+const notificationsRoute = require('./routes/notifications');
+
 const app  = express();
 const PORT = process.env.PORT || 3001;
 
@@ -26,6 +28,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/goals',   goalsRoute);
 app.use('/actions', actionsRoute);
+app.use('/notifications', notificationsRoute);
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => {
